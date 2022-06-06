@@ -5,15 +5,19 @@ import {
     Paper,
     Button,
     Typography,
+    Select,
+    MenuItem
 } from "@mui/material";
+
 import Label from "../components/Label";
 
 export function CandidateForm() {
-
+    const states =["Tamil Nadu"]
     const handleSubmit = (e) => {
         e.preventDefault()
         console.log(e)
     }
+
     return (
         <Grid container
             spacing={0}
@@ -62,8 +66,11 @@ export function CandidateForm() {
                                     <Grid item xs="12" lg="6">
                                         <Label value={'Date of Birth'} />
                                         <TextField
+                                        name="setTodaysDate"
+                                            // inputProps={{ max: "<?= date('Y-m-d'); ?>" }}
                                             style={{ width: "85%" }}
                                             type="date"
+                                            onChange={(e)=>{}}
                                             placeholder="Enter your DOB"
                                             fullWidth
                                             variant="outlined"
@@ -72,14 +79,24 @@ export function CandidateForm() {
                                     </Grid>
                                     <Grid item xs="12" lg="6">
                                         <Label value={'State'} />
-                                        <TextField
-                                            style={{ width: "85%" }}
-                                            type="select"
-                                            placeholder="Select your State"
+                                        <Select
+                                        style={{ width: "85%" }}
+                                            labelId="demo-simple-select-label"
+                                            id="demo-simple-select"
                                             fullWidth
-                                            variant="outlined"
-                                            required
-                                        />
+                                            // label={"Select a State"}
+                                            placeholder="Select a state"
+                                            // value={selectedValue ? selectedValue : null}
+                                            // label={label}
+                                            // onChange={onchange}
+                                        >
+                                            
+                                            {states && states.map((value) => {
+                                                return (
+                                                    <MenuItem value={value}>{value}</MenuItem>
+                                                )
+                                            })}
+                                        </Select>
                                     </Grid>
                                     <Grid item xs="12" lg="6">
                                         <Label value={'Age'} />
@@ -129,7 +146,8 @@ export function CandidateForm() {
                 </Grid>
             </Grid>
         </Grid>
+        
     );
-
+    
 }
 export default CandidateForm;
