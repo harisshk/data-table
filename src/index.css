@@ -11,3 +11,34 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.login-form {
+  justify-content: center;
+  min-height: 90vh;
+}
+
+.button-block {
+  width: 50%;
+  padding: 15px !important;
+}
+
+.form-button {
+  padding: 10px 26px !important;
+  margin-right: 25px !important;
+}
+
+.login-background {
+  justify-content: center;
+  min-height: 30vh;
+  width: 100%;
+  padding: 20px 50px 50px 50px;
+  background-color: aqua;
+}
+
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    margin: 0; 
+}
