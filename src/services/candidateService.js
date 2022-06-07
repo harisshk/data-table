@@ -4,7 +4,7 @@ import { candidateServiceUrl } from '../constants/url'
 
 export const getAllCandidates = async () => {
     try {
-        const response = await axios.get(`${candidateServiceUrl}/all`)
+        const response = await axios.get(`${candidateServiceUrl}/all/${localStorage.getItem('id')}`)
         if (response.data.success) {
             return {
                 ...response?.data
@@ -17,7 +17,7 @@ export const getAllCandidates = async () => {
 };
 export const getCandidateById = async (candidateId) => {
     try {
-        const response = await axios.get(`${candidateServiceUrl}/${candidateId}`)
+        const response = await axios.get(`${candidateServiceUrl}/${candidateId}/${localStorage.getItem('id')}`)
         if (response.data.success) {
             return {
                 ...response?.data
@@ -31,7 +31,7 @@ export const getCandidateById = async (candidateId) => {
 
 export const editCandidateData = async (candidateId, payload) => {
     try {
-        const response = await axios.put(`${candidateServiceUrl}/edit/${candidateId}`, payload)
+        const response = await axios.put(`${candidateServiceUrl}/edit/${candidateId}/${localStorage.getItem('id')}`, payload)
         if (response.data.success) {
             return {
                 ...response?.data
@@ -45,7 +45,7 @@ export const editCandidateData = async (candidateId, payload) => {
 
 export const createCandidate = async (payload) => {
     try {
-        const response = await axios.post(`${candidateServiceUrl}/create`, payload)
+        const response = await axios.post(`${candidateServiceUrl}/create/${localStorage.getItem('id')}`, payload)
         console.log(response)
         if (response.data.success) {
             return {

@@ -91,11 +91,10 @@ export function Login() {
         <>
             <Grid container
                 spacing={0}
-                direction="column"
                 alignItems="center"
                 justifyContent="center"
-                style={{ minHeight: '100vh' }} >
-                <Grid item >
+                style={{ minHeight: '100vh',margin:"0px" }} >
+                <Grid >
                     <Paper
                         variant="elevation"
                         elevation={4}
