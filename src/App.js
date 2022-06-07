@@ -2,29 +2,15 @@ import React from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 // components
 import { useSelector } from 'react-redux';
-import Login from './Screens/Auth/login';
-import Signup from './Screens/Auth/signup';
-import CandidateForm from './Screens/CandiateForm';
+import Login from './screens/Auth/login';
+import Signup from './screens/Auth/signup';
+import CandidateForm from './screens/candidateForm';
+import CandidateList from './screens/candidateList';
 // ----------------------------------------------------------------------
 
-function SecuredRoute(props) {
-  const profile = useSelector(state => state?.profile)
-  var decoded = profile ? true : false
-  //const isMobile = window.matchMedia("only screen and (max-width: 1200px)").matches
-  return (
-
-    <div>
-      <Route path={props.path} render={(data) => decoded === false ?
-        <Navigate to="/login" replace />
-        :
-        <props.component {...data}></props.component>
-      }></Route>
-    </div>
-  )
-}
 const ProtectedRoute = ({
   user,
-  redirectPath = '/landing',
+  redirectPath = '/login',
   children,
 }) => {
   if (!user) {
@@ -34,26 +20,33 @@ const ProtectedRoute = ({
   return children;
 };
 function App() {
-
+  const profile = useSelector(state => state?.profile)
   return (
     <BrowserRouter>
       <Routes>
         {/* <Route path="/" element={<Login />} /> */}
         <Route index path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/candidate/create" element={<CandidateForm />} />
+        <Route
+          path="/candidate/create"
+          element={
+            <ProtectedRoute user={profile?.token}>
+              <CandidateForm />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/candidate/list"
+          element={
+            <ProtectedRoute user={profile?.token}>
+              <CandidateList />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="*"
           element={<Navigate to="/login" replace />}
         />
-        {/* <Route
-          path="home"
-          element={
-            <ProtectedRoute user={user}>
-              <Home />
-            </ProtectedRoute>
-          }
-        /> */}
       </Routes>
     </BrowserRouter>
   );

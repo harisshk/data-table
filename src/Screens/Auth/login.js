@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useFormik, Form, FormikProvider } from 'formik';
 import * as Validation from 'yup';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 
 //MUI
 import {
@@ -15,13 +15,27 @@ import {
 } from "@mui/material";
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-
+// redux
+import { useDispatch } from 'react-redux';
+import { setProfile } from '../../redux/action/profile'
 // Components
 import Label from "../../components/Label";
 import PrimaryButton from "../../components/Button/PrimaryButton";
+import { AlertSnackbarBC } from '../../components/Snackbar';
+//Services
+import { login } from "../../services/authService";
 
 export function Login() {
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+    const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const [snackbarOpen, setSnackbarOpen] = useState(false)
+  const [snackbarInfo, setSnackbarInfo] = useState({
+    message: "",
+    variant: ""
+  })
     const handleShowPassword = () => {
         setShowPassword((show) => !show);
     };
@@ -37,7 +51,37 @@ export function Login() {
         validationSchema: UserSchema,
         onSubmit: async (data) => {
             const { email, password } = data
-            console.log("___", data)
+            setIsLoading(true)
+            const loginResponse = await login(email, password)
+            if (loginResponse.success) {
+                dispatch(setProfile(loginResponse));
+                setTimeout(() => {
+                    setIsLoading(false)
+                    navigate('/candidate/list', { replace: true });
+                }, 2000);
+            }
+            else {
+                setIsLoading(false)
+                if (loginResponse.message === "Mismatch email / password") {
+                    setSnackbarInfo({
+                        message: "Credentials error",
+                        variant: "error"
+                    })
+                    setSnackbarOpen(true)
+                } else if (loginResponse.message === "No account found using this email Id") {
+                    setSnackbarInfo({
+                        message: "Credentials error",
+                        variant: "error"
+                    })
+                    setSnackbarOpen(true)
+                } else {
+                    setSnackbarInfo({
+                        message: "Something went wrong",
+                        variant: "error"
+                    })
+                    setSnackbarOpen(true)
+                }
+            }
         }
     });
     const { errors, touched, handleSubmit, getFieldProps } = formik;
