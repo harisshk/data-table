@@ -24,6 +24,7 @@ import PrimaryButton from "../../components/Button/PrimaryButton";
 import { AlertSnackbarBC } from '../../components/Snackbar';
 //Services
 import { login } from "../../services/authService";
+import Loader from "../../components/Loader";
 
 export function Login() {
     const navigate = useNavigate();
@@ -32,10 +33,10 @@ export function Login() {
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [snackbarOpen, setSnackbarOpen] = useState(false)
-  const [snackbarInfo, setSnackbarInfo] = useState({
-    message: "",
-    variant: ""
-  })
+    const [snackbarInfo, setSnackbarInfo] = useState({
+        message: "",
+        variant: ""
+    })
     const handleShowPassword = () => {
         setShowPassword((show) => !show);
     };
@@ -87,83 +88,93 @@ export function Login() {
     const { errors, touched, handleSubmit, getFieldProps } = formik;
 
     return (
-        <Grid container
-            spacing={0}
-            direction="column"
-            alignItems="center"
-            justifyContent="center"
-            style={{ minHeight: '100vh' }} >
-            <Grid item >
-                <Paper
-                    variant="elevation"
-                    elevation={4}
-                    className="login-background"
-                >
-                    <Grid item>
-                        <Typography component="h1" variant="h6" marginBottom={"10px"} textAlign={"center"}>
-                            Login
-                        </Typography>
-                    </Grid>
-                    <Grid item>
-                        <FormikProvider value={formik}>
-                            <Form autoComplete="off" noValidate onSubmit={handleSubmit} >
-                                <Grid container direction="column" spacing={2}>
-                                    <Grid item>
-                                        <Label value={'Email Id'} />
-                                        <TextField
-                                            fullWidth
-                                            autoComplete="email"
-                                            type="email"
-                                            {...getFieldProps('email')}
-                                            error={Boolean(touched.email && errors.email)}
-                                            helperText={touched.email && errors.email}
-                                        />
-                                    </Grid>
-                                    <Grid item>
-                                        <Label value={'Password'} />
-                                        <TextField
-                                            fullWidth
-                                            autoComplete="current-password"
-                                            type={showPassword ? 'text' : 'password'}
-                                            {...getFieldProps('password')}
-                                            InputProps={{
-                                                endAdornment: (
-                                                    <InputAdornment position="end">
-                                                        <IconButton onClick={handleShowPassword} edge="end">
-                                                            {
-                                                                !showPassword ? <RemoveRedEyeIcon /> : <VisibilityOffIcon />
-                                                            }
-                                                        </IconButton>
-                                                    </InputAdornment>
-                                                )
-                                            }}
-                                            error={Boolean(touched.password && errors.password)}
-                                            helperText={touched.password && errors.password}
-                                        />
-                                    </Grid>
-                                    <Grid container item style={{ display: "flex", justifyContent: "center" }}>
-                                        <PrimaryButton value={"Login"} />
-                                    </Grid>
-                                    <Grid item>
-                                        <Typography
+        <>
+            <Grid container
+                spacing={0}
+                direction="column"
+                alignItems="center"
+                justifyContent="center"
+                style={{ minHeight: '100vh' }} >
+                <Grid item >
+                    <Paper
+                        variant="elevation"
+                        elevation={4}
+                        className="login-background"
+                    >
+                        <Grid item>
+                            <Typography component="h1" variant="h6" marginBottom={"10px"} textAlign={"center"}>
+                                Login
+                            </Typography>
+                        </Grid>
+                        <Grid item>
+                            <FormikProvider value={formik}>
+                                <Form autoComplete="off" noValidate onSubmit={handleSubmit} >
+                                    <Grid container direction="column" spacing={0}>
+                                        <Grid item>
+                                            <Label value={'Email Id'} />
+                                            <TextField
+                                                fullWidth
+                                                autoComplete="email"
+                                                type="email"
+                                                {...getFieldProps('email')}
+                                                error={Boolean(touched.email && errors.email)}
+                                                helperText={touched.email && errors.email}
+                                            />
+                                        </Grid>
+                                        <Grid item>
+                                            <Label value={'Password'} />
+                                            <TextField
+                                                fullWidth
+                                                autoComplete="current-password"
+                                                type={showPassword ? 'text' : 'password'}
+                                                {...getFieldProps('password')}
+                                                InputProps={{
+                                                    endAdornment: (
+                                                        <InputAdornment position="end">
+                                                            <IconButton onClick={handleShowPassword} edge="end">
+                                                                {
+                                                                    !showPassword ? <RemoveRedEyeIcon /> : <VisibilityOffIcon />
+                                                                }
+                                                            </IconButton>
+                                                        </InputAdornment>
+                                                    )
+                                                }}
+                                                error={Boolean(touched.password && errors.password)}
+                                                helperText={touched.password && errors.password}
+                                            />
+                                        </Grid>
+                                        <Grid container item style={{ display: "flex", justifyContent: "center", paddingTop: "20px" }}>
+                                            <br />
+                                            <PrimaryButton value={"Login"} />
+                                        </Grid>
+                                        <Grid item>
+                                            <Typography
 
-                                            sx={{
-                                                mt: 3,
-                                            }}
-                                        >
-                                            Don’t have an account?&nbsp;
-                                            <Link variant="subtitle2" component={RouterLink} to="/signup" underline="hover">
-                                                Register here.
-                                            </Link>
-                                        </Typography>
+                                                sx={{
+                                                    mt: 3,
+                                                }}
+                                            >
+                                                Don’t have an account?&nbsp;
+                                                <Link variant="subtitle2" component={RouterLink} to="/signup" underline="hover">
+                                                    Register here.
+                                                </Link>
+                                            </Typography>
+                                        </Grid>
                                     </Grid>
-                                </Grid>
-                            </Form>
-                        </FormikProvider>
-                    </Grid>
-                </Paper>
+                                </Form>
+                            </FormikProvider>
+                        </Grid>
+                    </Paper>
+                </Grid>
             </Grid>
-        </Grid>
+            <AlertSnackbarBC
+                open={snackbarOpen}
+                message={snackbarInfo.message}
+                variant={snackbarInfo.variant}
+                handleClose={() => setSnackbarOpen(false)}
+            />
+            <Loader open={isLoading} />
+        </>
     );
 
 }

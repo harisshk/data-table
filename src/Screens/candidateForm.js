@@ -17,9 +17,11 @@ import {
 // Components
 import Label from "../components/Label";
 import { states } from "../constants";
-import { createCandidate, editCandidateData, getCandidateById } from "../services/candidateService";
 import Loader from '../components/Loader'
 import { AlertSnackbar } from "../components/Snackbar";
+
+//Services
+import { createCandidate, editCandidateData, getCandidateById } from "../services/candidateService";
 export function CandidateForm() {
     const [isLoading, setIsLoading] = useState(false)
     const [isEdit, setIsEdit] = useState(false)
@@ -33,9 +35,9 @@ export function CandidateForm() {
     console.log(id)
     const FormSchema = Validation.object().shape({
         email: Validation.string().email('Email must be a valid email address').required('Email is required'),
-        name: Validation.string().min(2, 'Too Short!').max(50, 'Too Long!').required('Name required'),
+        name: Validation.string().min(2, 'Too Short!').max(50, 'Too Long!').required('Name is required'),
         age: Validation.number().required('Age is required').min(10, 'Too Short').max(140, 'Too Long!'),
-        pinCode: Validation.string().required('Pin-Code is required').max(6, "Not a valid Pin Code"),
+        pinCode: Validation.string().required('Pin-Code is required').min(5,  "Not a valid Pin Code").max(6, "Not a valid Pin Code"),
         state: Validation.string().required('State is required'),
         dateOfBirth: Validation.date().max(new Date()).required("DOB is required")
     });
@@ -202,10 +204,10 @@ export function CandidateForm() {
                                             <Button
                                                 variant="outlined"
                                                 color="primary"
-                                                type="submit"
+                                                type="reset"
                                                 className="form-button"
                                             >
-                                                Cancel
+                                                Reset
                                             </Button>
                                             <Button
                                                 variant="contained"

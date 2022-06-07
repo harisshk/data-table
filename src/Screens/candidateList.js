@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import CandidateTable from "../components/Table";
+
+//MUI
 import { Button } from '@mui/material';
-import { editCandidateData, getAllCandidates } from "../services/candidateService";
-import { AlertSnackbar } from "../components/Snackbar";
-import Loader from "../components/Loader";
 import AddIcon from '@mui/icons-material/Add';
+
+//Components
+import { AlertSnackbar } from "../components/Snackbar";
+import CandidateTable from "../components/Table";
+import Loader from "../components/Loader";
 import DeleteDialog from "../components/Dialog/DeleteDialog";
+
+//Services
+import { editCandidateData, getAllCandidates } from "../services/candidateService";
 
 const CandidateList = () => {
 
@@ -42,24 +48,24 @@ const CandidateList = () => {
         }
         setIsLoading(false)
     }
-    const deleteHandler = async (id) => {
+    const deleteHandler = async (id, payload, text) => {
         setIsLoading(true)
         const response = await editCandidateData(
-            id, { isDeleted: true }
+            id, payload
         )
         const { success } = response
         if (success) {
             fetchData()
             setSnackbarOpen(true)
             setSnackbarInfo({
-                message: "Data deleted successfully",
+                message: `Data ${text} successfully`,
                 variant: "success",
             })
         }
         else {
             setSnackbarOpen(true)
             setSnackbarInfo({
-                message: "Data cannot be deleted",
+                message: `Data cannot be  ${text}`,
                 variant: "error",
             })
         }
@@ -73,10 +79,14 @@ const CandidateList = () => {
             <p>Total Candidates : {candidates?.length}</p>
             <CandidateTable
                 users={candidates}
-                deleteHandler={ (data)=>{
+                deleteHandler={(data) => {
                     console.log(data)
-                    setDeleteAction({ isDeleteModalOpen: true, data })}}
+                    setDeleteAction({ isDeleteModalOpen: true, data })
+                }}
                 editHandler={editUserHandler}
+                statusHandler={(id, payload) => {
+                    deleteHandler(id, payload, 'Updated')
+                }}
             />
             <br />
             <div>
@@ -90,7 +100,7 @@ const CandidateList = () => {
             />
             <Loader open={isLoading} />
             <DeleteDialog data={deleteAction?.data} open={deleteAction?.isDeleteModalOpen} onDelete={(id) => {
-                deleteHandler(id)
+                deleteHandler(id, { isDeleted: true }, "Deleted")
                 setDeleteAction({
                     isDeleteModalOpen: false,
                     data: {}

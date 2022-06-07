@@ -14,7 +14,7 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-const CandidateTable = ({ users, editHandler, deleteHandler }) => {
+const CandidateTable = ({ users, editHandler, deleteHandler, statusHandler }) => {
 
     return (
         <TableContainer component={Paper}>
@@ -55,7 +55,7 @@ const CandidateTable = ({ users, editHandler, deleteHandler }) => {
                             </TableCell>
                             <TableCell className="userListTableText" align="left">
                                 <>
-                                    <TextField fullWidth select value={row.result}  >
+                                    <TextField disabled={row?.result !== "PENDING"} onChange={(e) => statusHandler(row?._id, { result: e.target.value })} fullWidth select value={row.result}  >
                                         <MenuItem key={"PENDING"} value={"PENDING"}>{"Pending"}</MenuItem>
                                         <MenuItem key={"SHORTLISTED"} value={"SHORTLISTED"}>{"Shortlisted"}</MenuItem>
                                         <MenuItem key={"REJECTED"} value={"REJECTED"}>{"Rejected"}</MenuItem>
