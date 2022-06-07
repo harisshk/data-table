@@ -19,14 +19,33 @@ const ProtectedRoute = ({
 
   return children;
 };
+const AuthRoute = ({
+  user,
+  redirectPath = '/candidate/list',
+  children,
+}) => {
+  if (user) {
+    return <Navigate to={redirectPath} replace />;
+  }
+
+  return children;
+};
 function App() {
   const profile = useSelector(state => state?.profile)
   return (
     <BrowserRouter>
       <Routes>
         {/* <Route path="/" element={<Login />} /> */}
-        <Route index path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+        <Route index path="/login" element={
+          <AuthRoute user={profile?.token}>
+            <Login />
+          </AuthRoute>
+        } />
+        <Route index path="/signup" element={
+          <AuthRoute user={profile?.token}>
+            <Signup />
+          </AuthRoute>
+        } />
         <Route
           path="/candidate/create"
           element={

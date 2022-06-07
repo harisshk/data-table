@@ -5,6 +5,10 @@ import { useNavigate } from "react-router-dom";
 import { Button } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 
+// redux
+import { useDispatch } from 'react-redux';
+import { setProfile } from '../redux/action/profile'
+
 //Components
 import { AlertSnackbar } from "../components/Snackbar";
 import CandidateTable from "../components/Table";
@@ -15,8 +19,8 @@ import DeleteDialog from "../components/Dialog/DeleteDialog";
 import { editCandidateData, getAllCandidates } from "../services/candidateService";
 
 const CandidateList = () => {
-
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const [candidates, setCandidates] = useState([])
     const [isLoading, setIsLoading] = useState(false)
@@ -76,6 +80,15 @@ const CandidateList = () => {
     }, [])
     return (
         <div className="homeContainer">
+            <div style={{ display: "flex", justifyContent: "flex-end", width: "100%" }}>
+                <Button
+                    variant="contained"
+                    onClick={() => {
+                        dispatch(setProfile({}))
+                        localStorage.clear()
+                        navigate('/')
+                    }} size="medium">Logout</Button>
+            </div>
             <p>Total Candidates : {candidates?.length}</p>
             <CandidateTable
                 users={candidates}
@@ -92,6 +105,8 @@ const CandidateList = () => {
             <div>
                 <Button startIcon={<AddIcon />} onClick={() => navigate("/candidate/create")} size="medium">Add new Candidate</Button>
             </div>
+
+
             <AlertSnackbar
                 open={snackbarOpen}
                 message={snackbarInfo.message}
