@@ -1,11 +1,10 @@
 const prod = {
     url: {
-        // BASE_URL: 'https://bike-backend-service.herokuapp.com'
+         BASE_URL: 'https://data-table-bc.herokuapp.com'
     }
 }
 const dev = {
     url: {
-        // BASE_URL: 'https://bike-backend-service.herokuapp.com'
         BASE_URL: 'http://localhost:5050'
     }
 }
