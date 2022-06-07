@@ -8,11 +8,13 @@ import {
     TableHead,
     TableRow,
     Paper,
-    Button
+    TextField,
+    MenuItem
 } from "@mui/material";
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 
-
-const CandidateTable = ({ users, editUserHandler, deleteUserHandler }) => {
+const CandidateTable = ({ users, editHandler, deleteHandler }) => {
 
     return (
         <TableContainer component={Paper}>
@@ -30,7 +32,7 @@ const CandidateTable = ({ users, editUserHandler, deleteUserHandler }) => {
                 <TableBody>
                     {users.map((row, index) => (
                         <TableRow
-                            key={row.id}
+                            key={row._id}
 
                             sx={{
                                 "&:last-child td, &:last-child th": { border: 0 },
@@ -52,22 +54,19 @@ const CandidateTable = ({ users, editUserHandler, deleteUserHandler }) => {
                                 {row.email}
                             </TableCell>
                             <TableCell className="userListTableText" align="left">
-                                { }
+                                <>
+                                    <TextField fullWidth select value={row.result}  >
+                                        <MenuItem key={"PENDING"} value={"PENDING"}>{"Pending"}</MenuItem>
+                                        <MenuItem key={"SHORTLISTED"} value={"SHORTLISTED"}>{"Shortlisted"}</MenuItem>
+                                        <MenuItem key={"REJECTED"} value={"REJECTED"}>{"Rejected"}</MenuItem>
+                                    </TextField>
+                                </>
                             </TableCell>
-                            <TableCell
-                                align="left"
-                                style={{
-                                    display: "flex",
-                                    flexDirection: "row",
-                                    justifyContent: "space-evenly"
-                                }}
-                            >
-                                <Button onClick={() => editUserHandler(row.id)} variant="outlined" style={{ fontSize: 12 }} color="primary">
-                                    Edit
-                                </Button>
-                                <Button onClick={() => deleteUserHandler(row.id)} variant="outlined" style={{ marginLeft: 5, fontSize: 12 }} color="error">
-                                    Delete
-                                </Button>
+                            <TableCell>
+                                <EditIcon onClick={() => editHandler(row._id)} style={{ margin: "0 10px" }} color="primary">
+                                </EditIcon>
+                                <DeleteIcon onClick={() => deleteHandler(row)} style={{ margin: "0 10px" }} color="error">
+                                </DeleteIcon>
                             </TableCell>
                         </TableRow>
                     ))}

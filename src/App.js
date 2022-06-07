@@ -36,6 +36,14 @@ function App() {
           }
         />
         <Route
+          path="/candidate/edit/:id"
+          element={
+            <ProtectedRoute user={profile?.token}>
+              <CandidateForm />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/candidate/list"
           element={
             <ProtectedRoute user={profile?.token}>

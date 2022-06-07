@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useFormik, Form, FormikProvider } from 'formik';
 import * as Validation from 'yup';
+import { useNavigate, useParams } from "react-router-dom";
 
 //MUI
 import {
@@ -16,19 +17,20 @@ import {
 // Components
 import Label from "../components/Label";
 import { states } from "../constants";
-import { useNavigate } from "react-router-dom";
-import { createCandidate } from "../services/candidateService";
+import { createCandidate, editCandidateData, getCandidateById } from "../services/candidateService";
 import Loader from '../components/Loader'
 import { AlertSnackbar } from "../components/Snackbar";
 export function CandidateForm() {
     const [isLoading, setIsLoading] = useState(false)
+    const [isEdit, setIsEdit] = useState(false)
     const [snackbarOpen, setSnackbarOpen] = useState(false)
     const [snackbarInfo, setSnackbarInfo] = useState({
         message: "",
         variant: ""
     })
     const navigate = useNavigate();
-
+    const id = useParams();
+    console.log(id)
     const FormSchema = Validation.object().shape({
         email: Validation.string().email('Email must be a valid email address').required('Email is required'),
         name: Validation.string().min(2, 'Too Short!').max(50, 'Too Long!').required('Name required'),
@@ -49,10 +51,10 @@ export function CandidateForm() {
         validationSchema: FormSchema,
         onSubmit: async (data) => {
             setIsLoading(true)
-            const response = await createCandidate(data)
+            const response = isEdit ? await editCandidateData(id?.id, data) : await createCandidate(data)
             if (response.success) {
                 setSnackbarInfo({
-                    message: "Candidate added successfully",
+                    message: `Candidate ${isEdit ? 'updated' : 'added'} successfully`,
                     variant: "success",
                 });
                 setSnackbarOpen(true);
@@ -62,7 +64,7 @@ export function CandidateForm() {
                 }, 2000);
             } else {
                 setSnackbarInfo({
-                    message: "Candidate cannot be added",
+                    message: `Candidate cannot be ${isEdit ? 'updated' : 'added'}`,
                     variant: "error",
                 });
                 setSnackbarOpen(true);
@@ -70,8 +72,34 @@ export function CandidateForm() {
             }
         }
     });
-    const { errors, touched, handleSubmit, getFieldProps } = formik;
-
+    const { errors, touched, handleSubmit, getFieldProps, setFieldValue } = formik;
+    const getBikeData = async () => {
+        const response = await getCandidateById(id?.id)
+        setIsLoading(true)
+        if (response?.success) {
+            const { name, age, dateOfBirth, email, pinCode, state } = response.data
+            setFieldValue('name', name)
+            setFieldValue('age', age)
+            setFieldValue('dateOfBirth', dateOfBirth)
+            setFieldValue('email', email)
+            setFieldValue('pinCode', pinCode)
+            setFieldValue('state', state)
+        } else {
+            setSnackbarOpen(true)
+            setSnackbarInfo({
+                message: `Bike data cannot be fetched`,
+                variant: "error",
+            });
+        }
+        setIsLoading(false)
+    }
+    useEffect(() => {
+        if (id?.id) {
+            setIsEdit(true)
+            getBikeData()
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [id?.id])
     return (
         <>
             <Grid container
@@ -185,7 +213,7 @@ export function CandidateForm() {
                                                 type="submit"
                                                 className="form-button"
                                             >
-                                                {"Create"}
+                                                {isEdit ? "Update" : "Create"}
                                             </Button>
                                         </Grid>
                                     </Form>
@@ -207,4 +235,4 @@ export function CandidateForm() {
     );
 
 }
-export default CandidateForm;
+export default CandidateForm
