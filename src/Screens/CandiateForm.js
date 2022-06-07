@@ -1,22 +1,47 @@
 import React from "react";
+import { useFormik, Form, FormikProvider } from 'formik';
+import * as Validation from 'yup';
+
+//MUI
 import {
     TextField,
     Grid,
     Paper,
     Button,
     Typography,
-    Select,
+    FormControl,
     MenuItem
 } from "@mui/material";
 
+// Components
 import Label from "../components/Label";
 
 export function CandidateForm() {
-    const states =["Tamil Nadu"]
-    const handleSubmit = (e) => {
-        e.preventDefault()
-        console.log(e)
-    }
+    const states = ["Tamil Nadu", "Karnataka", "Kerala", "Maharastra", "West Bengal"]
+    const FormSchema = Validation.object().shape({
+        email: Validation.string().email('Email must be a valid email address').required('Email is required'),
+        name: Validation.string().min(2, 'Too Short!').max(50, 'Too Long!').required('Name required'),
+        age: Validation.number().required('Age is required').min(10, 'Too Short').max(140, 'Too Long!'),
+        pinCode: Validation.string().required('Pin-Code is required').max(6, "Not a valid Pin Code"),
+        state: Validation.string().required('State is required'),
+        dateOfBirth: Validation.date().max(new Date()).required("DOB is required")
+    });
+    const formik = useFormik({
+        initialValues: {
+            email: '',
+            name: '',
+            age: '',
+            pinCode: '',
+            state: '',
+            dateOfBirth: '',
+        },
+        validationSchema: FormSchema,
+        onSubmit: async (data) => {
+            const { email, password } = data
+            console.log("___", data)
+        }
+    });
+    const { errors, touched, handleSubmit, getFieldProps } = formik;
 
     return (
         <Grid container
@@ -38,116 +63,110 @@ export function CandidateForm() {
                             </Typography>
                         </Grid>
                         <Grid item xs="12" >
-                            <form onSubmit={handleSubmit}>
-                                <Grid container spacing={2} display="flex" justifyContent="center">
-                                    <Grid item xs="12" lg="6">
-                                        <Label value={'Name'} />
-                                        <TextField
-                                            style={{ width: "85%" }}
-                                            type="text"
-                                            placeholder="Enter your Name"
-                                            fullWidth
-                                            variant="outlined"
-                                            required
-                                            autoFocus
-                                        />
+                            <FormikProvider value={formik}>
+                                <Form autoComplete="off" noValidate onSubmit={handleSubmit} >
+                                    <Grid container spacing={2} display="flex" justifyContent="center">
+                                        <Grid style={{ padding: "0 10px" }} xs={12} sm={12} lg={6} xl={6} item >
+                                            <Label value={'Name'} />
+                                            <TextField
+                                                fullWidth
+                                                autoComplete="name"
+                                                type="text"
+                                                {...getFieldProps('name')}
+                                                error={Boolean(touched.name && errors.name)}
+                                                helperText={touched.name && errors.name}
+                                            />
+                                        </Grid>
+                                        <Grid style={{ padding: "0 10px" }} xs={12} sm={12} lg={6} xl={6} item >
+                                            <Label value={'Email'} />
+                                            <TextField
+                                                fullWidth
+                                                autoComplete="email"
+                                                type="email"
+                                                {...getFieldProps('email')}
+                                                error={Boolean(touched.email && errors.email)}
+                                                helperText={touched.email && errors.email}
+                                            />
+                                        </Grid>
+                                        <Grid style={{ padding: "0 10px" }} xs={12} sm={12} lg={6} xl={6} item >
+                                            <Label value={'Date Of Birth'} />
+                                            <TextField
+                                                fullWidth
+                                                type="date"
+                                                {...getFieldProps('dateOfBirth')}
+                                                error={Boolean(touched.dateOfBirth && errors.dateOfBirth)}
+                                                helperText={touched.dateOfBirth && errors.dateOfBirth}
+                                            />
+                                        </Grid>
+                                        <Grid style={{ padding: "0 10px" }} xs={12} sm={12} lg={6} xl={6} item >
+                                            <Label value={'State'} />
+                                            <FormControl fullWidth>
+                                                <TextField
+                                                    select
+                                                    {...getFieldProps('state')}
+                                                    error={Boolean(touched.state && errors.state)}
+                                                    helperText={touched.state && errors.state}
+                                                >
+                                                    {states && states.map((value) => {
+                                                        return (
+                                                            <MenuItem value={value}>{value}</MenuItem>
+                                                        )
+                                                    })}
+                                                </TextField>
+                                            </FormControl>
+                                        </Grid>
+                                        <Grid style={{ padding: "0 10px" }} xs={12} sm={12} lg={6} xl={6} item >
+                                            <Label value={'Age'} />
+                                            <TextField
+                                                fullWidth
+                                                placeholder="Enter the Age"
+                                                type="number"
+                                                {...getFieldProps('age')}
+                                                error={Boolean(touched.age && errors.age)}
+                                                helperText={touched.age && errors.age}
+                                            />
+                                        </Grid>
+
+                                        <Grid style={{ padding: "0 10px" }} xs={12} sm={12} lg={6} xl={6} item >
+                                            <Label value={'PinCode'} />
+                                            <TextField
+                                                fullWidth
+                                                type="number"
+                                                placeholder="Enter the Pin-Code"
+                                                {...getFieldProps('pinCode')}
+                                                error={Boolean(touched.pinCode && errors.pinCode)}
+                                                helperText={touched.pinCode && errors.pinCode}
+                                            />
+                                        </Grid>
+
                                     </Grid>
-                                    <Grid item xs="12" lg="6">
-                                        <Label value={'Address'} />
-                                        <TextField
-                                            style={{ width: "85%" }}
-                                            type="address"
-                                            placeholder="Enter your Address"
-                                            fullWidth
+                                    <Grid container item style={{ marginTop: "40px", justifyContent: "flex-end" }} >
+                                        <Button
                                             variant="outlined"
-                                            required
-                                        />
-                                    </Grid>
-                                    <Grid item xs="12" lg="6">
-                                        <Label value={'Date of Birth'} />
-                                        <TextField
-                                        name="setTodaysDate"
-                                            // inputProps={{ max: "<?= date('Y-m-d'); ?>" }}
-                                            style={{ width: "85%" }}
-                                            type="date"
-                                            onChange={(e)=>{}}
-                                            placeholder="Enter your DOB"
-                                            fullWidth
-                                            variant="outlined"
-                                            required
-                                        />
-                                    </Grid>
-                                    <Grid item xs="12" lg="6">
-                                        <Label value={'State'} />
-                                        <Select
-                                        style={{ width: "85%" }}
-                                            labelId="demo-simple-select-label"
-                                            id="demo-simple-select"
-                                            fullWidth
-                                            // label={"Select a State"}
-                                            placeholder="Select a state"
-                                            // value={selectedValue ? selectedValue : null}
-                                            // label={label}
-                                            // onChange={onchange}
+                                            color="primary"
+                                            type="submit"
+                                            className="form-button"
                                         >
-                                            
-                                            {states && states.map((value) => {
-                                                return (
-                                                    <MenuItem value={value}>{value}</MenuItem>
-                                                )
-                                            })}
-                                        </Select>
+                                            Cancel
+                                        </Button>
+                                        <Button
+                                            variant="contained"
+                                            color="primary"
+                                            type="submit"
+                                            className="form-button"
+                                        >
+                                            {"Create"}
+                                        </Button>
                                     </Grid>
-                                    <Grid item xs="12" lg="6">
-                                        <Label value={'Age'} />
-                                        <TextField
-                                            style={{ width: "85%" }}
-                                            type="number"
-                                            placeholder="Enter your Age"
-                                            fullWidth
-                                            min={1}
-                                            variant="outlined"
-                                            required
-                                        />
-                                    </Grid>
-                                    <Grid item xs="12" lg="6">
-                                        <Label value={'Pin Code'} />
-                                        <TextField
-                                            style={{ width: "85%" }}
-                                            type="address"
-                                            placeholder="Enter your Pin Code"
-                                            fullWidth
-                                            variant="outlined"
-                                            required
-                                        />
-                                    </Grid>
-                                </Grid>
-                                <Grid container item style={{ marginTop: "40px", justifyContent: "flex-end" }} >
-                                    <Button
-                                        variant="outlined"
-                                        color="primary"
-                                        type="submit"
-                                        className="form-button"
-                                    >
-                                        Cancel
-                                    </Button>
-                                    <Button
-                                        variant="contained"
-                                        color="primary"
-                                        type="submit"
-                                        className="form-button"
-                                    >
-                                        {"Create"}
-                                    </Button>
-                                </Grid>
-                            </form>
+                                </Form>
+                            </FormikProvider>
                         </Grid>
                     </Paper>
                 </Grid>
             </Grid>
         </Grid>
-        
+
     );
-    
+
 }
 export default CandidateForm;
