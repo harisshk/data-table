@@ -132,6 +132,7 @@ export function CandidateForm() {
                                                     fullWidth
                                                     autoComplete="name"
                                                     type="text"
+                                                    placeholder="Enter the name"
                                                     {...getFieldProps('name')}
                                                     error={Boolean(touched.name && errors.name)}
                                                     helperText={touched.name && errors.name}
@@ -142,6 +143,7 @@ export function CandidateForm() {
                                                 <TextField
                                                     fullWidth
                                                     autoComplete="email"
+                                                    placeholder="Enter the email"
                                                     type="email"
                                                     {...getFieldProps('email')}
                                                     error={Boolean(touched.email && errors.email)}
@@ -153,6 +155,7 @@ export function CandidateForm() {
                                                 <TextField
                                                     fullWidth
                                                     type="date"
+                                                    placeholder="Select the date of Birth"
                                                     {...getFieldProps('dateOfBirth')}
                                                     error={Boolean(touched.dateOfBirth && errors.dateOfBirth)}
                                                     helperText={touched.dateOfBirth && errors.dateOfBirth}
@@ -163,6 +166,7 @@ export function CandidateForm() {
                                                 <FormControl fullWidth>
                                                     <TextField
                                                         select
+                                                        placeholder="Select the State"
                                                         {...getFieldProps('state')}
                                                         error={Boolean(touched.state && errors.state)}
                                                         helperText={touched.state && errors.state}
@@ -204,10 +208,11 @@ export function CandidateForm() {
                                             <Button
                                                 variant="outlined"
                                                 color="primary"
-                                                type="reset"
+                                                type="button"
                                                 className="form-button"
+                                                onClick={()=> navigate("/candidate/list")}
                                             >
-                                                Reset
+                                                Back
                                             </Button>
                                             <Button
                                                 variant="contained"

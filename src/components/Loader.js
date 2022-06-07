@@ -7,8 +7,8 @@ export default function Loader(props) {
     return (
         <div>
             <Backdrop open={open}>
-                <CircularProgress color="inherit" />
-                &nbsp;&nbsp;&nbsp; Loading...
+                <CircularProgress color="primary" />
+                &nbsp;&nbsp;&nbsp; <p style={{color:"white"}}>Loading...</p>
             </Backdrop>
         </div>
     )
