@@ -23,9 +23,8 @@ const CandidateTable = ({ users, editHandler, deleteHandler, statusHandler }) =>
                     <TableRow>
                         <TableCell className="userListTableHeading">Id</TableCell>
                         <TableCell className="userListTableHeading" align="left">Name</TableCell>
-                        <TableCell className="userListTableHeading" align="left">Date of Birth</TableCell>
+                        <TableCell className="userListTableHeading" align="left">Age</TableCell>
                         <TableCell className="userListTableHeading" align="left">Email</TableCell>
-                        <TableCell className="userListTableHeading" align="left">Result</TableCell>
                     </TableRow>
                 </TableHead>
 
@@ -48,19 +47,10 @@ const CandidateTable = ({ users, editHandler, deleteHandler, statusHandler }) =>
                                 {row.name}
                             </TableCell>
                             <TableCell className="userListTableText" align="left">
-                                {row.dateOfBirth}
+                                {row.age}
                             </TableCell>
                             <TableCell className="userListTableText" align="left">
                                 {row.email}
-                            </TableCell>
-                            <TableCell className="userListTableText" align="left">
-                                <>
-                                    <TextField disabled={row?.result !== "PENDING"} onChange={(e) => statusHandler(row?._id, { result: e.target.value })} fullWidth select value={row.result}  >
-                                        <MenuItem key={"PENDING"} value={"PENDING"}>{"Pending"}</MenuItem>
-                                        <MenuItem key={"SHORTLISTED"} value={"SHORTLISTED"}>{"Shortlisted"}</MenuItem>
-                                        <MenuItem key={"REJECTED"} value={"REJECTED"}>{"Rejected"}</MenuItem>
-                                    </TextField>
-                                </>
                             </TableCell>
                             <TableCell>
                                 <EditIcon onClick={() => editHandler(row._id)} style={{ margin: "0 10px" }} color="primary">

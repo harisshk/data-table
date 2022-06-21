@@ -16,12 +16,36 @@ import Loader from "../components/Loader";
 import DeleteDialog from "../components/Dialog/DeleteDialog";
 
 //Services
-import { editCandidateData, getAllCandidates } from "../services/candidateService";
+// import { editCandidateData, getAllCandidates } from "../services/candidateService";
+import { gql, useMutation, useQuery } from "@apollo/client";
+import { DELETE_CANDIDATE, GET_ALL_CANDIDATES } from "../constants";
 
 const CandidateList = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
-
+    const [deleteUser, { loading:deleteLoading }] = useMutation(DELETE_CANDIDATE, 
+        {
+            onCompleted:()=>{
+                setSnackbarInfo({
+                    message: `Candidate deleted successfully`,
+                    variant: "success",
+                });
+                setSnackbarOpen(true);
+                refetch()
+                setTimeout(() => {
+                    setIsLoading(false)
+                    navigate('/candidate/list', { replace: true });
+                }, 1000);
+            },
+            onError:()=>{
+                setSnackbarInfo({
+                    message: `Candidate cannot be deleted `,
+                    variant: "error",
+                });
+                setSnackbarOpen(true)
+                setIsLoading(false)
+            }
+        });
     const [candidates, setCandidates] = useState([])
     const [isLoading, setIsLoading] = useState(false)
     const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -36,48 +60,13 @@ const CandidateList = () => {
     const editUserHandler = (id) => {
         navigate(`/candidate/edit/${id}`);
     }
-    const fetchData = async () => {
-        setIsLoading(true)
-        const response = await getAllCandidates()
-        const { success, data } = response
-        if (success) {
-            setCandidates(data)
-        }
-        else {
-            setSnackbarOpen(false)
-            setSnackbarInfo({
-                message: "Cannot fetch data",
-                variant: "error",
-            })
-        }
-        setIsLoading(false)
+
+    const { loading, data, refetch } = useQuery(GET_ALL_CANDIDATES)
+    const deleteHandler = async (id) => {
+        deleteUser({variables:{
+            id
+        }})
     }
-    const deleteHandler = async (id, payload, text) => {
-        setIsLoading(true)
-        const response = await editCandidateData(
-            id, payload
-        )
-        const { success } = response
-        if (success) {
-            fetchData()
-            setSnackbarOpen(true)
-            setSnackbarInfo({
-                message: `Data ${text} successfully`,
-                variant: "success",
-            })
-        }
-        else {
-            setSnackbarOpen(true)
-            setSnackbarInfo({
-                message: `Data cannot be  ${text}`,
-                variant: "error",
-            })
-        }
-        setIsLoading(false)
-    }
-    useEffect(() => {
-        fetchData()
-    }, [])
     return (
         <div className="homeContainer">
             <div style={{ display: "flex", justifyContent: "flex-end", width: "100%" }}>
@@ -89,9 +78,9 @@ const CandidateList = () => {
                         navigate('/')
                     }} size="medium">Logout</Button>
             </div>
-            <p>Total Candidates : {candidates?.length}</p>
+            <p>Total Candidates : {data?.candidates?.length}</p>
             <CandidateTable
-                users={candidates}
+                users={data?.candidates || []}
                 deleteHandler={(data) => {
                     console.log(data)
                     setDeleteAction({ isDeleteModalOpen: true, data })
@@ -113,7 +102,7 @@ const CandidateList = () => {
                 variant={snackbarInfo.variant}
                 handleClose={() => setSnackbarOpen(false)}
             />
-            <Loader open={isLoading} />
+            <Loader open={loading || deleteLoading} />
             <DeleteDialog data={deleteAction?.data} open={deleteAction?.isDeleteModalOpen} onDelete={(id) => {
                 deleteHandler(id, { isDeleted: true }, "Deleted")
                 setDeleteAction({

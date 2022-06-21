@@ -16,15 +16,19 @@ import {
 
 // Components
 import Label from "../components/Label";
-import { states } from "../constants";
+import { CREATE_CANDIDATE, GET_CANDIDATES_BY_ID, states, UPDATE_CANDIDATE } from "../constants";
 import Loader from '../components/Loader'
 import { AlertSnackbar } from "../components/Snackbar";
 
 //Services
-import { createCandidate, editCandidateData, getCandidateById } from "../services/candidateService";
+import { editCandidateData, getCandidateById } from "../services/candidateService";
+import { useMutation, useQuery } from "@apollo/client";
+
+
 export function CandidateForm() {
     const [isLoading, setIsLoading] = useState(false)
     const [isEdit, setIsEdit] = useState(false)
+    const [editData, setData] = useState({})
     const [snackbarOpen, setSnackbarOpen] = useState(false)
     const [snackbarInfo, setSnackbarInfo] = useState({
         message: "",
@@ -32,29 +36,42 @@ export function CandidateForm() {
     })
     const navigate = useNavigate();
     const id = useParams();
-    console.log(id)
     const FormSchema = Validation.object().shape({
         email: Validation.string().email('Email must be a valid email address').required('Email is required'),
         name: Validation.string().min(2, 'Too Short!').max(50, 'Too Long!').required('Name is required'),
         age: Validation.number().required('Age is required').min(10, 'Too Short').max(140, 'Too Long!'),
-        pinCode: Validation.string().required('Pin-Code is required').min(5,  "Not a valid Pin Code").max(6, "Not a valid Pin Code"),
         state: Validation.string().required('State is required'),
-        dateOfBirth: Validation.date().max(new Date()).required("DOB is required")
-    });
+    }); 
     const formik = useFormik({
         initialValues: {
             email: '',
             name: '',
             age: '',
-            pinCode: '',
             state: '',
-            dateOfBirth: '',
         },
         validationSchema: FormSchema,
-        onSubmit: async (data) => {
+        onSubmit: async (inputData) => {
             setIsLoading(true)
-            const response = isEdit ? await editCandidateData(id?.id, data) : await createCandidate(data)
-            if (response.success) {
+            const input = {
+                ...inputData,
+            }
+            isEdit ?
+            updateUser({ variables: { ...input, id:id?.id }})
+            :
+            createUser({ variables: { ...input } });
+        }
+    });
+    const { errors, touched, handleSubmit, getFieldProps, setFieldValue } = formik;
+    const setEditData = (data) => {
+        const {name, age, email, state}= data?.getCandidateById
+        setFieldValue('name', name)
+        setFieldValue('age', age)
+        setFieldValue('email', email)
+        setFieldValue('state', state)
+    }
+    const [createUser, { loading }] = useMutation(CREATE_CANDIDATE, 
+        {
+            onCompleted:()=>{
                 setSnackbarInfo({
                     message: `Candidate ${isEdit ? 'updated' : 'added'} successfully`,
                     variant: "success",
@@ -63,45 +80,51 @@ export function CandidateForm() {
                 setTimeout(() => {
                     setIsLoading(false)
                     navigate('/candidate/list', { replace: true });
-                }, 2000);
-            } else {
+                }, 1000);
+            },
+            onError:()=>{
                 setSnackbarInfo({
                     message: `Candidate cannot be ${isEdit ? 'updated' : 'added'}`,
                     variant: "error",
                 });
-                setSnackbarOpen(true);
+                setSnackbarOpen(true)
                 setIsLoading(false)
             }
-        }
-    });
-    const { errors, touched, handleSubmit, getFieldProps, setFieldValue } = formik;
-    const getBikeData = async () => {
-        const response = await getCandidateById(id?.id)
-        setIsLoading(true)
-        if (response?.success) {
-            const { name, age, dateOfBirth, email, pinCode, state } = response.data
-            setFieldValue('name', name)
-            setFieldValue('age', age)
-            setFieldValue('dateOfBirth', dateOfBirth)
-            setFieldValue('email', email)
-            setFieldValue('pinCode', pinCode)
-            setFieldValue('state', state)
-        } else {
-            setSnackbarOpen(true)
-            setSnackbarInfo({
-                message: `Bike data cannot be fetched`,
-                variant: "error",
-            });
-        }
-        setIsLoading(false)
-    }
+        });
+    const [updateUser, { loading:updateLoading }] = useMutation(UPDATE_CANDIDATE, 
+        {
+            onCompleted:()=>{
+                setSnackbarInfo({
+                    message: `Candidate ${isEdit ? 'updated' : 'added'} successfully`,
+                    variant: "success",
+                });
+                setSnackbarOpen(true);
+                setTimeout(() => {
+                    setIsLoading(false)
+                    navigate('/candidate/list', { replace: true });
+                }, 1000);
+            },
+            onError:()=>{
+                setSnackbarInfo({
+                    message: `Candidate cannot be ${isEdit ? 'updated' : 'added'}`,
+                    variant: "error",
+                });
+                setSnackbarOpen(true)
+                setIsLoading(false)
+            }
+        });
+    const { data: candidateData,error, loading: dataFetched } = useQuery(GET_CANDIDATES_BY_ID, {
+        variables:{
+            id:id?.id,
+        },
+        skip: id?.id === false
+    })
     useEffect(() => {
-        if (id?.id) {
+        if(!dataFetched && candidateData){
+            setEditData(candidateData);
             setIsEdit(true)
-            getBikeData()
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [id?.id])
+      }, [dataFetched, candidateData])
     return (
         <>
             <Grid container
@@ -151,17 +174,6 @@ export function CandidateForm() {
                                                 />
                                             </Grid>
                                             <Grid style={{ padding: "0 10px" }} xs={12} sm={12} lg={6} xl={6} item >
-                                                <Label value={'Date Of Birth'} />
-                                                <TextField
-                                                    fullWidth
-                                                    type="date"
-                                                    placeholder="Select the date of Birth"
-                                                    {...getFieldProps('dateOfBirth')}
-                                                    error={Boolean(touched.dateOfBirth && errors.dateOfBirth)}
-                                                    helperText={touched.dateOfBirth && errors.dateOfBirth}
-                                                />
-                                            </Grid>
-                                            <Grid style={{ padding: "0 10px" }} xs={12} sm={12} lg={6} xl={6} item >
                                                 <Label value={'State'} />
                                                 <FormControl fullWidth>
                                                     <TextField
@@ -190,19 +202,6 @@ export function CandidateForm() {
                                                     helperText={touched.age && errors.age}
                                                 />
                                             </Grid>
-
-                                            <Grid style={{ padding: "0 10px" }} xs={12} sm={12} lg={6} xl={6} item >
-                                                <Label value={'PinCode'} />
-                                                <TextField
-                                                    fullWidth
-                                                    type="number"
-                                                    placeholder="Enter the Pin-Code"
-                                                    {...getFieldProps('pinCode')}
-                                                    error={Boolean(touched.pinCode && errors.pinCode)}
-                                                    helperText={touched.pinCode && errors.pinCode}
-                                                />
-                                            </Grid>
-
                                         </Grid>
                                         <Grid container item style={{ marginTop: "40px", justifyContent: "flex-end" }} >
                                             <Button
@@ -210,7 +209,7 @@ export function CandidateForm() {
                                                 color="primary"
                                                 type="button"
                                                 className="form-button"
-                                                onClick={()=> navigate("/candidate/list")}
+                                                onClick={() => navigate("/candidate/list")}
                                             >
                                                 Back
                                             </Button>
@@ -236,7 +235,7 @@ export function CandidateForm() {
                 variant={snackbarInfo.variant}
                 handleClose={() => setSnackbarOpen(false)}
             />
-            <Loader open={isLoading} />
+            <Loader open={loading || dataFetched} />
         </>
 
     );

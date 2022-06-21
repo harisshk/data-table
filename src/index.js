@@ -8,8 +8,16 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react'
 import { store, persistor } from '../src/redux/store.js'
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-
+import {
+  ApolloClient,
+  InMemoryCache,
+  ApolloProvider
+} from "@apollo/client";
 const root = ReactDOM.createRoot(document.getElementById('root'));
+const client = new ApolloClient({
+  uri: 'http://localhost:5050/graphql',
+  cache: new InMemoryCache()
+});
 const theme = createTheme({
   palette: {
     primary: {
@@ -24,7 +32,9 @@ root.render(
       <PersistGate loading={null} persistor={persistor}>
         <ThemeProvider theme={theme}>
 
-          <App />
+          <ApolloProvider client={client}>
+            <App />
+          </ApolloProvider>
         </ThemeProvider>
       </PersistGate>
     </Provider>
